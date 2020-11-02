@@ -1,0 +1,83 @@
+class Spawner : ZilchComponent
+{
+  [Dependency] var ObjectLink : ObjectLink;
+  
+  [Property] var InitialDelay : Real = 5;
+  [Property] var MinDelayBetweenSpawns : Real = 5;
+  [Property] var MaxDelayBetweenSpawns : Real = 10;
+  [Property] var SpawnHowMany : Integer;
+  [Property] var WhatToSpawn : Archetype;
+  [Property] var AfterNumOfEnemies : Integer;
+  
+  [Property] var HealthPackSpawnDelay : Real = 5.0; //Only use this if you are spawning a health pack
+  
+  var PlayerDead : Boolean;
+  var Rand = Random();
+  var Cooldown : Real = 0;
+  var PlayerDimension : Real = 1;
+  var EnemiesDead : Integer;
+  var HealthDelay : Real;
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.EnemyKilled, this.OnEnemyDeath);
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.ChangeDimension, this.DimensionalShift);
+    Zero.Connect(this.Space, Events.PlayerDeath, this.OnPlayerDeath);
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (this.WhatToSpawn == Archetype.HealthPack){
+        this.HealthDelay -= event.Dt;
+      if (this.PlayerDimension == 2){
+        if (this.HealthDelay <= 0 && this.EnemiesDead >= this.AfterNumOfEnemies){
+          this.HealthDelay = this.HealthPackSpawnDelay;
+          this.SpawnHowMany -= 1;
+          this.Space.CreateAtPosition(Archetype.HealthPack, this.Owner.Transform.Translation);
+        }
+      }
+  if (this.SpawnHowMany == 0){
+    if (this.ObjectLink.ObjectA != null){
+      this.ObjectLink.ObjectA.ObjectLink.ObjectB = null;
+    }
+    this.Owner.Destroy();
+  }
+    }
+    if (this.ObjectLink.ObjectB == null && !this.PlayerDead && this.EnemiesDead >= this.AfterNumOfEnemies && this.WhatToSpawn != Archetype.HealthPack){
+    this.InitialDelay -= event.Dt;
+    if (this.InitialDelay <= 0){
+        this.Cooldown -= event.Dt;
+        if (this.Cooldown <= 0 && this.PlayerDimension == 1){
+          if (!this.Owner.Sprite.Visible){
+          this.Owner.Sprite.Visible = true;
+          this.Owner.Sprite.SpriteSource = SpriteSource.EnemySpawn;
+        }
+        if (this.Owner.Sprite.CurrentFrame == 8){
+            --this.SpawnHowMany;
+            this.Cooldown = this.Rand.Range(this.MinDelayBetweenSpawns, this.MaxDelayBetweenSpawns);
+            this.Space.CreateAtPosition(this.WhatToSpawn, this.Owner.Transform.WorldTranslation);
+            this.Owner.Sprite.Visible = false;
+          }
+        }
+      }
+  if (this.SpawnHowMany == 0){
+    if (this.ObjectLink.ObjectA != null){
+      this.ObjectLink.ObjectA.ObjectLink.ObjectB = null;
+    }
+    this.Owner.Destroy();
+  }
+}
+}
+  function OnEnemyDeath(event : ZilchEvent){
+    ++this.EnemiesDead;
+  }
+  function OnPlayerDeath(event : ZilchEvent){
+    this.PlayerDead = true;
+  }
+
+  function DimensionalShift(event : DimensionEvent)
+  {
+    this.PlayerDimension = event.Dimension;
+  }
+}
+

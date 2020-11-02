@@ -1,0 +1,56 @@
+class ShadowTurret : ZilchComponent
+{
+  [Dependency] var Transform : Transform;
+  [Dependency] var ObjectLink : ObjectLink;
+  
+  [Property] var Direction = Real3(1.0,0,0);  
+  [Property] var DebugDrawOn : Boolean = true;
+  
+  sends DamagePlayer : ZilchEvent;
+  
+  var Laser : Cog;
+  var PlayerDimension : Real = 1;
+  var Action : Action;
+  var Track : Boolean = false;
+  var PlayerLoc : Real3;
+  var Seq : ActionSequence;
+  function Initialize(init : CogInitializer)
+  {
+    this.Laser  = this.Owner.Children.Current;
+    this.Laser.Area.Size = Real2(0,0);
+    Zero.Connect(this.Space, Events.ActivateTurrets, this.OnActivation);
+    Zero.Connect(this.Space, Events.DeactivateTurrets, this.OnDeactivation);
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+  }
+
+  function OnActivation(event : ZilchEvent)
+  {
+    this.Seq = Actions.Sequence(this.Owner.Actions);
+    this.Action = Action.Property(this.Seq, @this.Owner.Children.Current.Sprite.VertexColor, Real4(this.Owner.Children.Current.Sprite.VertexColor.XYZ, 0.5), 3, Ease.Linear);
+    this.Action = Action.Property(this.Seq, @this.Laser.Transform.Scale, Real3(this.Owner.Transform.Scale.X, 3, this.Owner.Transform.Scale.Z), 10, Ease.QuadIn);
+    this.Action = Action.Property(this.Seq, @this.Laser.Transform.Scale, Real3(this.Owner.Transform.Scale.X, 14, this.Owner.Transform.Scale.Z), 0.1, Ease.Linear);
+    this.Action = Action.Call(this.Seq, this.KillPlayer);
+    this.Action = Action.Property(this.Seq, @this.Laser.Transform.Scale, Real3(this.Owner.Transform.Scale.X, 3, this.Owner.Transform.Scale.Z), 0.1, Ease.Linear);
+    this.Action = Action.Property(this.Seq, @this.Laser.Sprite.VertexColor, Real4(255,0,0,0), 3, Ease.Linear);
+  }
+  
+  function KillPlayer()
+  {
+    this.Space.DispatchEvent(Events.DamagePlayer, ZilchEvent());
+  }
+
+  function OnDeactivation(event : ZilchEvent)
+  {
+    this.Seq.Cancel();
+    this.Owner.Children.Current.Sprite.VertexColor = Real4(this.Laser.Sprite.VertexColor.XYZ, 0);
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (this.ObjectLink.ObjectB != null){
+      this.PlayerLoc = this.ObjectLink.WorldPointB;
+    }
+      this.Owner.Transform.Rotation = Math.ToQuaternion(Real3(0,0,Math.Angle2D(this.PlayerLoc - this.Owner.Transform.Translation)));
+      this.Owner.Children.Current.Area.Size = Real2(Math.Distance(this.Owner.Transform.Translation, this.PlayerLoc)-0.2,0.05);
+  }
+}

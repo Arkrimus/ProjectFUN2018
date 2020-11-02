@@ -1,0 +1,22 @@
+class BackgroundMove : ZilchComponent
+{
+  [Property] var ScrollSpeed : Real = 5;
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+  }
+  
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (this.Owner.Transform.Translation == Real3(64, -62.25, -5)){
+      this.Owner.Transform.Translation = Real3(64,62.25,-5);
+    }
+    
+    if (this.Owner.Transform.Translation == Real3(64,0,-5)){
+      Action.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(64,-62.25,-5), this.ScrollSpeed, Ease.Linear);
+    }
+    if (this.Owner.Transform.Translation == Real3(64, 62.25,-5)){
+      Action.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(64,0,-5), this.ScrollSpeed, Ease.Linear);
+    }
+  }
+}

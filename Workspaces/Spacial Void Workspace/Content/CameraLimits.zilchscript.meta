@@ -1,0 +1,16 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "CameraLimits"
+		var ResourceId = 0x5bf3c0a17feaf905
+	}
+	ContentTags 
+	{
+		var Tags = Array
+		{
+			"CamScript"
+		}
+	}
+}

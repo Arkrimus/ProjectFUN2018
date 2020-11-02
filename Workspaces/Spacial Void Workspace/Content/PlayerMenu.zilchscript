@@ -1,0 +1,84 @@
+class PlayerMenu : ZilchComponent
+{
+  var ActionSeq : ActionSequence;
+  var CurrentLoc : String = "Play";
+  
+  function Initialize(init : CogInitializer)
+  {
+
+    Zero.Connect(this.Space, Events.PlayHover, this.HoverPlayer);
+    Zero.Connect(this.Space, Events.HoverOptions, this.HoverOptions);
+    Zero.Connect(this.Space, Events.CreditsHover, this.HoverCredits);
+    Zero.Connect(this.Space, Events.PlayClicked, this.PlayClick);
+  }
+  
+  function HoverOptions(event : ZilchEvent)
+  {
+    if (this.CurrentLoc == "Play"){
+      this.CurrentLoc = "Controls";
+      this.ActionSeq = Actions.Sequence(this.Owner.Actions);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,-25))), 0.25, Ease.Linear);
+      Actions.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(16,-6,0), 0.5, Ease.QuadInOut);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation,  Math.ToQuaternion(Math.ToRadians(Real3(0,0,0))), 0.25, Ease.Linear);
+    }
+    if (this.CurrentLoc == "Credits"){
+      this.CurrentLoc = "Controls";
+      this.ActionSeq = Actions.Sequence(this.Owner.Actions);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,-25))), 0.35, Ease.Linear);
+      Actions.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(16,-6,0), 0.75, Ease.QuadInOut);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation,  Math.ToQuaternion(Math.ToRadians(Real3(0,0,0))), 0.35, Ease.Linear);
+    }
+  }
+
+
+  function HoverPlayer(event : ZilchEvent)
+  {
+    if (this.CurrentLoc == "Controls"){
+      this.ActionSeq = Actions.Sequence(this.Owner.Actions);
+      this.CurrentLoc = "Play";
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,25))), 0.25, Ease.Linear);
+      Actions.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(0,-6,0), 0.5, Ease.QuadInOut);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation,  Math.ToQuaternion(Math.ToRadians(Real3(0,0,0))), 0.25, Ease.Linear);
+    }
+    if (this.CurrentLoc == "Credits"){
+      this.ActionSeq = Actions.Sequence(this.Owner.Actions);
+      this.CurrentLoc = "Play";
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,-25))), 0.25, Ease.Linear);
+      Actions.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(0,-6,0), 0.5, Ease.QuadInOut);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation,  Math.ToQuaternion(Math.ToRadians(Real3(0,0,0))), 0.25, Ease.Linear);
+    }
+  }
+  
+  function HoverCredits(events : ZilchEvent){
+      if (this.CurrentLoc == "Controls"){
+        this.ActionSeq = Actions.Sequence(this.Owner.Actions);
+        this.CurrentLoc = "Credits";
+        Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,25))), 0.3, Ease.Linear);
+        Actions.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(-16,-6,0), 0.75, Ease.QuadInOut);
+        Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation,  Math.ToQuaternion(Math.ToRadians(Real3(0,0,0))), 0.3, Ease.Linear);
+      }
+    if (this.CurrentLoc == "Play"){
+      this.CurrentLoc = "Credits";
+      this.ActionSeq = Actions.Sequence(this.Owner.Actions);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,25))), 0.25, Ease.Linear);
+      Actions.Property(this.Owner.Actions, @this.Owner.Transform.Translation, Real3(-16,-6,0), 0.5, Ease.QuadInOut);
+      Actions.Property(this.ActionSeq, @this.Owner.Transform.Rotation,  Math.ToQuaternion(Math.ToRadians(Real3(0,0,0))), 0.25, Ease.Linear);
+    }
+  }
+  
+  function PlayClick(event : ZilchEvent){
+    var seq = Actions.Sequence(this.Owner.Actions);
+    Actions.Property(seq, @this.Owner.Transform.Translation, Real3(0, 30, 2.5), 1, Ease.QuadIn);
+    Actions.Call(seq, this.Play);
+  }
+  
+  function ControlClick(event : ZilchEvent){
+    
+  }
+  
+  function Play()
+  {
+    this.Space.LoadLevel(Level.TheGame);
+  }
+  
+}

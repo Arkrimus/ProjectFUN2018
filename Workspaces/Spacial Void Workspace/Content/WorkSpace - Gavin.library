@@ -1,0 +1,8 @@
+[Version:1]
+ContentLibrary 
+{
+	var Name = "WorkSpace - Gavin"
+	var LibraryId = 0x5bf2da539e04cb7f
+	var SourceControlType = ""
+	var ReadOnly = false
+}

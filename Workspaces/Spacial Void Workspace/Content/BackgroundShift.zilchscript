@@ -1,0 +1,35 @@
+class BackgroundShift : ZilchComponent
+{
+  [Property] var BackSpeed : Real;
+  var OriginalColors : Real4;
+  var PlayerDead = false;
+  function Initialize(init : CogInitializer)
+  {
+    this.OriginalColors = this.Owner.Sprite.VertexColor;
+    Zero.Connect(this.Space, Events.ChangeDimension, this.ShiftColors);
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.PlayerDeath, this.OnPlayerDeath);
+  }
+
+  function OnPlayerDeath(event : ZilchEvent)
+  {
+    this.PlayerDead = true;
+  }
+  
+  
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (!this.PlayerDead)
+      this.Owner.RigidBody.Velocity = -this.Owner.ObjectLink.ObjectB.RigidBody.Velocity/this.BackSpeed;
+  }
+
+  function ShiftColors(event : DimensionEvent)
+  {
+    if (event.Dimension == 1){
+      Action.Property(this.Owner.Actions, @this.Owner.Sprite.VertexColor, this.OriginalColors, 1, Ease.Linear);
+    } else {
+      Action.Property(this.Owner.Actions, @this.Owner.Sprite.VertexColor, Real4(1,0,0,1), 1.0, Ease.Linear);
+    }
+  }
+
+}

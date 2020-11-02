@@ -1,0 +1,20 @@
+[Version:1]
+ImageContent 
+{
+	SpriteSourceBuilder 
+	{
+		var Name = "EnemyHeavy"
+		var ResourceId = 0x5b4892a5ee86d16e
+		var FrameSizeX = 301
+		var FrameSizeY = 301
+		var FrameCount = 1
+		var FrameDelay = 0.0833333358
+		var OriginX = 150
+		var OriginY = 150
+		var PixelsPerUnit = 64
+		var Sampling = SpriteSampling.Linear
+		var Looping = true
+		var Slices = Real4{0, 0, 0, 0}
+		var Fill = SpriteFill.Stretch
+	}
+}

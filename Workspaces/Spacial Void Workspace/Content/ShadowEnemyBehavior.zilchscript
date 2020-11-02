@@ -1,0 +1,120 @@
+class ShadowEnemyBehavior : ZilchComponent
+{
+  [Dependency] var ObjectLink : ObjectLink;
+  [Dependency] var RigidBody : RigidBody;
+  [Dependency] var DragEffect : DragEffect;
+  [Dependency] var Transform : Transform;
+  [Dependency] var ForceEffect : ForceEffect;
+  
+  [Property] var HitPoints : Real = 10;
+  [Property] var Range : Real = 6.5;
+  [Property] var DelayBetweenShots = 0.5;
+  [Property] var BulletSpeed = 50;
+  
+  sends EnemyKilled : ZilchEvent;
+  
+  var PlayerDead : Boolean = false;
+  var Angle : Real;
+  var PlayerDimension : Real = 2;
+  var OriginalColors : Real4;
+  var ShootingCooldown = 0.0;
+  
+  function Initialize(init : CogInitializer)
+  {
+    this.OriginalColors = this.Owner.Sprite.VertexColor;
+    this.Owner.Sprite.VertexColor = Real4(0,0,0,1);
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.ChangeDimension, this.ChangeDimension);
+    Zero.Connect(this.Space, Events.PlayerDeath, this.PlayerDeath);
+
+    Zero.Connect(this.Owner, Events.CollisionStarted, this.OnCollisionStarted);
+    Zero.Connect(this.Owner, Events.CollisionEnded, this.OnCollisionStop);
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (this.PlayerDimension == 2 && this.PlayerDead == false){
+      this.Owner.ForceEffect.Active = true;
+      this.Rotate();
+      this.ShootingCooldown -= event.Dt;
+      if (this.ShootingCooldown <= 0){
+        this.Shoot();
+      }
+    
+    } else {
+      this.Owner.ForceEffect.Active = false;
+    }
+    
+    if (this.PlayerDead == true){
+      this.Owner.DragEffect.LinearDamping = 4;
+      this.Owner.DragEffect.AngularDamping = 5;
+    }
+    
+    
+  }
+  
+  
+  function Shoot()
+  {
+    if (Math.Sqrt(Math.Pow(this.ObjectLink.WorldPointB.X - this.ObjectLink.WorldPointA.X, 2) + Math.Pow(this.ObjectLink.WorldPointB.Y - this.ObjectLink.WorldPointA.Y, 2)) < this.Range)
+    {
+      this.ShootingCooldown = this.DelayBetweenShots;
+      var bullet = this.Space.CreateAtPosition(Archetype.EnemyBullet, this.Transform.WorldTranslation);
+      bullet.RigidBody.Velocity = Real3(Math.Cos(this.Angle)*this.BulletSpeed, Math.Sin(this.Angle)*this.BulletSpeed,0);
+    }
+  }
+
+  
+  function Rotate()
+  {
+    var targetVector = this.ObjectLink.WorldPointB - this.ObjectLink.WorldPointA;
+    this.Angle = Math.Angle2D(targetVector);
+    this.Owner.Transform.Rotation = Math.ToQuaternion(Real3(0,0,this.Angle-Math.Pi/2));
+  }
+  
+  function OnCollisionStarted(event : CollisionEvent)
+  {
+    if (event.OtherObject.Archetype == Archetype.EnemySlowZone){
+      this.ForceEffect.Strength = 0;
+      this.DragEffect.LinearDamping = 1.5;
+    }
+    
+    if (event.OtherObject.Archetype == Archetype.PlayerBullet){
+      this.HitPoints -= 1;
+      event.OtherObject.Destroy();
+      if (this.HitPoints == 0){
+        this.Space.DispatchEvent(Events.EnemyKilled, ZilchEvent());
+        this.Space.CreateAtPosition(Archetype.Explosion, this.Transform.WorldTranslation);
+        this.Owner.Destroy();
+      }
+    }
+  }
+  
+  function OnCollisionStop(event : CollisionEvent){
+    if (event.OtherObject.Archetype == Archetype.EnemySlowZone){
+      this.ForceEffect.Strength = 30;
+      this.DragEffect.LinearDamping = 0.5;
+    }
+    
+
+  }
+  
+  function PlayerDeath(event : ZilchEvent)
+  {
+    this.PlayerDead = true;
+  }
+  
+  function ChangeDimension(event : DimensionEvent)
+  {
+    this.PlayerDimension = event.Dimension;
+    this.DimensionalHandling(this.PlayerDimension);
+  }
+  
+  function DimensionalHandling(dimension : Real){
+    if (dimension == 2){
+      Action.Property(this.Owner.Actions, @this.Owner.Sprite.VertexColor, this.OriginalColors, 1, Ease.Linear);
+    } else {
+      Action.Property(this.Owner.Actions, @this.Owner.Sprite.VertexColor, Real4(0,0,0,1), 1, Ease.Linear);
+    }
+  }
+}

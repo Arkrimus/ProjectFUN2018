@@ -1,0 +1,10 @@
+[Version:1]
+DataContent 
+{
+	RichAnimationBuilder 
+	{
+		var Name = "DimensionalChange"
+		var ResourceId = 0x5b45eaf3d1e5bf7e
+		var PreviewArchetype = ""
+	}
+}

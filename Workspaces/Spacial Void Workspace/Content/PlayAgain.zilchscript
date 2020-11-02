@@ -1,0 +1,20 @@
+class PlayAgain : ZilchComponent
+{
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.MouseUpdate, this.OnMouseMove);
+  }
+
+  function OnMouseMove(event : ViewportMouseEvent)
+  {
+
+    if (event.HitObject == this.Owner){
+      this.Owner.Sprite.VertexColor = Real4(0.26,0.26,0.26,1);
+      if (Zero.Mouse.IsButtonDown(MouseButtons.Left)){
+        this.Space.LoadLevel(Level.TheGame);
+      }
+    } else {
+      this.Owner.Sprite.VertexColor = Real4(1,1,1,1);
+    }
+  }
+}

@@ -1,0 +1,24 @@
+class HealthPacks : ZilchComponent
+{
+  var Dimension = 1;
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.ChangeDimension, this.OnDimensionChange);
+    
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+  }
+  
+  function OnDimensionChange(event : DimensionEvent){
+    if (event.Dimension == 1){
+      this.Owner.Sprite.Visible = false;
+      this.Owner.Transform.Translation = Real3(this.Owner.Transform.Translation.XY, -100);
+    } else {
+      this.Owner.Sprite.Visible = true;
+      this.Owner.Transform.Translation = Real3(this.Owner.Transform.Translation.XY, 1);
+    }
+  }
+}

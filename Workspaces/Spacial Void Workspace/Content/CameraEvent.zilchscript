@@ -1,0 +1,34 @@
+class CameraLock : ZilchComponent
+{
+  [Dependency] var Transform : Transform;
+  //Location of the camera
+  var Loc : Real3;
+  var R = Random();
+  //Initialization function
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.LockCamera, this.OnLocUpdate);
+    Zero.Connect(this.Space, Events.Shake, this.OnDamage);
+  }
+  
+  //updates the camera's location.
+  function OnLocUpdate(event : CameraEvent){
+    this.Loc = event.LockLocation;
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (Zero.Keyboard.KeyIsPressed(Keys.R)){
+      this.Space.LoadLevel(Level.MenuItsGreat);
+    }
+    this.Owner.Transform.WorldTranslation = this.Loc + Real3(0,0,10);
+  }
+  
+  function OnDamage(event : ZilchEvent){
+    var actionSequence = Actions.Sequence(this.Owner.Actions);
+    Action.Property(actionSequence, @this.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,0.75))) , 0.025, Ease.Linear);
+    Action.Property(actionSequence, @this.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,-0.75))), 0.05, Ease.Linear);
+    Action.Property(actionSequence, @this.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,0))),0.025, Ease.Linear);
+  }
+}

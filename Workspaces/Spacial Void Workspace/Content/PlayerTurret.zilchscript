@@ -1,0 +1,80 @@
+class PlayerTurret : ZilchComponent
+{
+  [Dependency] var Transform : Transform;
+  
+  [Property] var DelayBetweenShots : Real = 0.25;
+  [Property] var BulletSpeed : Real = 50;
+  
+  var OgColor : Real4;
+  var ShootingCooldown = 0.0;
+  var Angle : Real;
+  var R = Random();
+  
+  function Initialize(init : CogInitializer)
+  {
+    this.OgColor = this.Owner.Sprite.VertexColor;
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.MouseMove, this.OnMouseMove);
+    Zero.Connect(this.Space, Events.ChangeDimension, this.ChangeDim);
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    
+    this.Transform.WorldRotation = Math.ToQuaternion(Real3(0,0,this.Angle-Math.Pi/2));
+    
+    this.ShootingCooldown -= event.Dt;
+    if (Zero.Mouse.IsButtonDown(MouseButtons.Left)){
+      this.Owner.Children.Current.Sprite.Visible = true;
+    } else {
+      this.Owner.Children.Current.Sprite.Visible = false;
+    }
+    if (Zero.Mouse.IsButtonDown(MouseButtons.Left) && this.ShootingCooldown <= 0){
+      this.ShootingCooldown = this.DelayBetweenShots;
+      var speed = Real3(
+                Math.Cos(this.Angle + this.R.Range(-(Math.ToRadians(3)),Math.ToRadians(3)))*this.BulletSpeed,
+                Math.Sin(this.Angle + this.R.Range(-(Math.ToRadians(3)),Math.ToRadians(3)))*this.BulletSpeed,
+                0);
+      
+      this.Owner.SimpleSound.Play();
+      var bullet = this.Space.CreateAtPosition(Archetype.PlayerBullet, this.Owner.Transform.WorldTranslation);
+      bullet.Transform.Rotation = Math.ToQuaternion(Real3(0,0,this.Angle-Math.Pi/2));
+      this.Bounce();
+      bullet.RigidBody.Velocity = speed;
+    }
+  }
+  
+  function OnMouseMove(event : ViewportMouseEvent)
+  {
+    this.Angle = Math.Angle2D(event.ToWorldZPlane(0) - this.Transform.WorldTranslation);
+  }
+  
+  
+  function ChangeDim(event : DimensionEvent)
+  {
+    
+  }
+  
+  
+  function Bounce(){
+    var seq = Actions.Sequence(this.Owner.Actions);
+    var dir = this.Owner.Transform.EulerAngles.Z;
+    
+    if (dir > 0){
+    dir = dir-(Math.Pi);
+     } else{
+    dir = dir+(Math.Pi);
+    }
+    
+    dir += Math.Pi/2;
+    Actions.Property(seq, @this.Owner.Transform.LocalTranslation, Real3(Math.Cos(dir), Math.Sin(dir),2) * 0.1, 0.1, Ease.QuadInOut);
+    Actions.Property(seq, @this.Owner.Transform.LocalTranslation, Real3(0,0,2), 0.1, Ease.QuadInOut);
+    
+  }
+  
+  function Feedback(){
+      var seq = Actions.Sequence(this.Owner.Actions);
+      Actions.Property(seq, @this.Owner.Sprite.VertexColor, Real4(255,255,255,1), 0.05, Ease.Linear);
+      Actions.Property(seq, @this.Owner.Sprite.VertexColor, this.OgColor, 0.05, Ease.Linear);
+  }
+}

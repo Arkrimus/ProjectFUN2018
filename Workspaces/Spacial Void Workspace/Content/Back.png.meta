@@ -1,0 +1,20 @@
+[Version:1]
+ImageContent 
+{
+	SpriteSourceBuilder 
+	{
+		var Name = "Back"
+		var ResourceId = 0x5b9e7a81719cee37
+		var FrameSizeX = 400
+		var FrameSizeY = 240
+		var FrameCount = 1
+		var FrameDelay = 0.0833333358
+		var OriginX = 200
+		var OriginY = 120
+		var PixelsPerUnit = 64
+		var Sampling = SpriteSampling.Linear
+		var Looping = true
+		var Slices = Real4{0, 0, 0, 0}
+		var Fill = SpriteFill.Stretch
+	}
+}

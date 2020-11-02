@@ -1,0 +1,22 @@
+class Play : ZilchComponent
+{
+  sends PlayHover : ZilchEvent;
+  sends PlayClicked : ZilchEvent;
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.MouseUpdate, this.Kek);
+  }
+  
+  function Kek(event : ViewportMouseEvent){
+    if(event.HitObject == this.Owner){
+      this.Space.DispatchEvent(Events.PlayHover, ZilchEvent());
+      this.Owner.Sprite.VertexColor = Real4(0.26,0.26,0.26,1);
+
+      if (event.IsButtonDown(MouseButtons.Left)){
+        this.Space.DispatchEvent(Events.PlayClicked, ZilchEvent());
+      }
+    } else {
+      this.Owner.Sprite.VertexColor = Real4(1,1,1,1);
+    }
+  }
+}

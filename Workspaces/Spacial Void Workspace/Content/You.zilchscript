@@ -1,0 +1,28 @@
+class You : ZilchComponent
+{
+  var EnemiesKilled : Integer = 0;
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.EnemyKilled, this.OnEnemyKilled);
+    Zero.Connect(this.Space, Events.PlayerDeath, this.OnPlayerDeath);
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (this.EnemiesKilled == 255){
+      this.Owner.SpriteText.Text = "You win!";
+      this.Owner.SpriteText.Visible = true;
+    }
+  }
+  
+  function OnPlayerDeath(event : ZilchEvent){
+    this.Owner.SpriteText.VertexColor = Real4(255,0,0,1);
+    this.Owner.SpriteText.Text = "You died!";
+    this.Owner.SpriteText.Visible = true;
+  }
+  
+  function OnEnemyKilled(event : ZilchEvent){
+    ++this.EnemiesKilled;
+  }
+}

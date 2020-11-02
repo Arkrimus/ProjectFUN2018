@@ -1,0 +1,33 @@
+class AbilityIcon : ZilchComponent
+{
+  [Dependency] var Area : Area;
+  
+  var CastPart : Integer;
+  var OgSize : Real2;
+  var OgColors : Real4;
+  function Initialize(init : CogInitializer)
+  {
+    this.OgSize = this.Owner.Area.Size;
+    this.OgColors = this.Owner.Sprite.VertexColor;
+    Zero.Connect(this.Space, Events.ChangeDimension, this.OnDimensionChange);
+  }
+
+  function OnDimensionChange(event : DimensionEvent)
+  {
+    ++this.CastPart;
+    if (this.CastPart == 1){
+      this.Owner.Sprite.VertexColor = Real4(255,0,0,1);
+      this.Owner.Area.Size = Real2(0,1.75);
+      Action.Property(this.Owner.Actions, @this.Owner.Area.Size, this.OgSize, 2, Ease.Linear);
+    }
+    
+    if (this.CastPart == 2){
+      this.CastPart = 0;
+      this.Owner.Area.Size = Real2(0,1.75);
+      this.Owner.Sprite.VertexColor = this.OgColors;
+      Action.Property(this.Owner.Actions, @this.Owner.Area.Size, this.OgSize, 2, Ease.Linear);
+
+    }
+    
+  }
+}

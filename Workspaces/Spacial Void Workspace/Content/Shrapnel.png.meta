@@ -1,0 +1,20 @@
+[Version:1]
+ImageContent 
+{
+	SpriteSourceBuilder 
+	{
+		var Name = "Shrapnel"
+		var ResourceId = 0x5b580a66780533e7
+		var FrameSizeX = 208
+		var FrameSizeY = 208
+		var FrameCount = 1
+		var FrameDelay = 0.0833333358
+		var OriginX = 104
+		var OriginY = 104
+		var PixelsPerUnit = 64
+		var Sampling = SpriteSampling.Linear
+		var Looping = true
+		var Slices = Real4{0, 0, 0, 0}
+		var Fill = SpriteFill.Stretch
+	}
+}

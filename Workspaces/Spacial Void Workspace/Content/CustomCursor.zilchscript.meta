@@ -1,0 +1,16 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "CustomCursor"
+		var ResourceId = 0x5b85047335014422
+	}
+	ContentTags 
+	{
+		var Tags = Array
+		{
+			"HUDScript"
+		}
+	}
+}

@@ -1,0 +1,17 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "CameraEvent"
+		var ResourceId = 0x5bf2ad891539c458
+	}
+	ContentTags 
+	{
+		var Tags = Array
+		{
+			"CameraScript"
+			"ZilchScript"
+		}
+	}
+}

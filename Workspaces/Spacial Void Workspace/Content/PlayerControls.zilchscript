@@ -1,0 +1,337 @@
+class PlayerControls : ZilchComponent
+{
+  //Dependencies for a player object
+  [Dependency] var Transform : Transform;
+  [Dependency] var ForceEffect : ForceEffect;
+  
+  //Properties of the player
+  [Property] var Speed : Real = 12.5;
+  [Property] var TurnSpeed : Real = 1;
+  [Property] var DimensionalRiftCooldown : Real = 2.0;
+  [Property] var HitPoints : Real = 10.0;
+  [Property] var HealingFromPacks : Real = 10;
+  
+  sends FadeAnimation : ZilchEvent;
+  sends Shake : ZilchEvent;
+  
+  //Var declarations
+  var AbilityCooldown = 0.0;
+  var PlayerDimension : Real = 1;
+  var PlayerDead = false;
+  var EnemiesKilled = 0;
+  var Rand = Random();
+  var DimensionalAnimation : SpriteSource = SpriteSource.DimensionAnimation;
+  
+  var RotateAction : Action;
+  var Rotation : Real = 0.0;
+  var TurnDelay : Real;
+  var TargetRot : Real;
+  var OgColor : Real4;
+  //Init function
+
+  var SpikeCooldown : Real = 0.0;
+
+  function Initialize(init : CogInitializer)
+  {
+    this.OgColor = this.Owner.Sprite.VertexColor;
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    Zero.Connect(this.Space, Events.ChangeDimension, this.ChangeDimension);
+    Zero.Connect(this.Space, Events.EnemyKilled, this.OnEnemyKilled);
+    Zero.Connect(this.Space, Events.DamagePlayer, this.DamagePlayer);
+    
+    Zero.Connect(this.Owner, Events.CollisionStarted, this.OnCollisionStarted);
+    Zero.Connect(this.Owner, Events.CollisionEnded, this.OnCollisionStopped);
+  }
+
+
+
+
+  //Handles all player input and controls
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    this.LockCamera();
+    var rotation = Real2(0);
+    
+    //Cooldowns
+    this.AbilityCooldown -= event.Dt;
+    
+    
+    if (!this.PlayerDead){
+    
+    
+    //Handles interdimensional travel
+    if (Zero.Keyboard.KeyIsPressed(Keys.Space) && this.AbilityCooldown <= 0){
+      this.Ability();
+      this.AbilityCooldown = this.DimensionalRiftCooldown;
+    }
+    
+    
+    if (this.Owner.Sprite.CurrentFrame == 15 && this.Owner.Sprite.SpriteSource == SpriteSource.DimensionAnimation){
+      this.Owner.Sprite.SpriteSource = SpriteSource.MovingShip;
+    }
+    
+    
+    
+    
+    if (this.HitPoints <= 0){
+      this.Space.DispatchEvent(Events.PlayerDeath, DamageEvent());
+      this.PlayerDead = true;
+      this.Space.CreateAtPosition(Archetype.Explosion, this.Owner.Transform.WorldTranslation);
+      this.Owner.Destroy();
+    }
+      
+    
+    
+    //Movement controls
+    if (Zero.Keyboard.KeyIsDown(Keys.W)) {
+      rotation += Real2(0,1);
+    }
+    if (Zero.Keyboard.KeyIsDown(Keys.S)){
+      rotation += Real2(0,-1);
+    }
+    if (Zero.Keyboard.KeyIsDown(Keys.A)){
+      rotation += Real2(-1,0);
+    }
+    if (Zero.Keyboard.KeyIsDown(Keys.D)){
+      rotation += Real2(1,0);
+    }
+    if (!Zero.Keyboard.KeyIsDown(Keys.W) && !Zero.Keyboard.KeyIsDown(Keys.S) && !Zero.Keyboard.KeyIsDown(Keys.A) && !Zero.Keyboard.KeyIsDown(Keys.D)){
+      this.ForceEffect.Active = false;
+      this.Owner.Sprite.SpriteSource = SpriteSource.IdlePlayer;
+      this.Owner.ChildrenArray.Get(2).BoxParticleEmitter.Active = false;
+    } else {
+      this.ForceEffect.Active = true;
+    }
+    
+    if (Zero.Keyboard.KeyIsPressed(Keys.W) ||
+        Zero.Keyboard.KeyIsPressed(Keys.S) ||
+        Zero.Keyboard.KeyIsPressed(Keys.A) ||
+        Zero.Keyboard.KeyIsPressed(Keys.D)){
+      this.Owner.Sprite.SpriteSource = SpriteSource.MovingShip;
+      this.Owner.ChildrenArray.Get(2).BoxParticleEmitter.Active = true;
+    }
+    
+    
+    var targetRot = 0.0;
+    if(rotation == Real2(1,0)){
+      targetRot = -90;
+    } else
+      if(rotation == Real2(-1,0)){
+        targetRot = 90;
+      } else
+        if (rotation == Real2(0,1)){
+          targetRot = 0.0;
+        } else 
+         if (rotation == Real2(0,-1)){
+           targetRot = 180;
+         } else
+          if (rotation == Real2(1,1)){
+            targetRot = -45;
+          } else
+            if (rotation == Real2(1,-1)){
+              targetRot = -135;
+            } else 
+              if (rotation == Real2(-1,1)){
+                targetRot = 45;
+              } else 
+                if (rotation == Real2(-1,-1)){
+                  targetRot = 135;
+                }
+    
+    this.Rotation = Math.ToDegrees(this.Owner.Transform.EulerAngles).Z;
+    this.TurnDelay-=event.Dt;
+    
+    if (this.RotateAction != null){
+      if (this.RotateAction.Active){
+        var rotDif = 0.0;
+        if (Math.Abs(this.Rotation-targetRot) >= 180){
+          rotDif = 360 - Math.Abs(this.Rotation-targetRot);
+        } else {
+          rotDif = Math.Abs(this.Rotation-targetRot);
+        }
+        if (rotDif >= 80){
+          this.ForceEffect.Active = false;
+        }
+      } else {
+          if (!Zero.Keyboard.KeyIsDown(Keys.W) && !Zero.Keyboard.KeyIsDown(Keys.S) && !Zero.Keyboard.KeyIsDown(Keys.A) && !Zero.Keyboard.KeyIsDown(Keys.D)){
+            this.ForceEffect.Active = false;
+          } else {
+            this.ForceEffect.Active = true;
+          }
+      }
+    }
+    
+    this.SpikeCooldown -= event.Dt;
+    if (rotation != Real2(0) && this.TurnDelay <= 0 && this.TargetRot != targetRot){
+      this.TargetRot = targetRot;
+      this.TurnDelay = 0.1;
+      
+      this.Rotate(targetRot);
+    }
+  }
+}
+  
+  
+  
+  function DamagePlayer(event : ZilchEvent)
+  {
+    this.HitPoints -= 12.5;
+    this.DamageFeedback();
+    this.Owner.ChildrenArray.Get(1).PlayerTurret.Feedback();
+    this.Space.DispatchEvent(Events.Shake, ZilchEvent());
+    var updateHealth = DamageEvent();
+    updateHealth.NewHealth = this.HitPoints;
+    this.Space.DispatchEvent(Events.UpdateHealthbar, updateHealth);
+  }
+  
+  function OnEnemyKilled(event : ZilchEvent)
+  {
+    this.EnemiesKilled += 1;
+  }
+  
+  
+  function OnCollisionStopped(event : CollisionEvent){
+    if (event.OtherObject.Archetype == Archetype.SpikeHitbox)
+      event.OtherObject.Parent.ForceEffect.Direction = Real3(0,1,0);
+  }
+
+
+  function OnCollisionStarted(event : CollisionEvent){
+  
+
+    if (event.OtherObject.Archetype == Archetype.HealthPack){
+      this.HitPoints = Math.Clamp(this.HitPoints + this.HealingFromPacks, 0, 50);
+      this.Owner.ChildrenArray.Get(1).PlayerTurret.Feedback();
+      event.OtherObject.Destroy();
+      var updateHealth = DamageEvent();
+      updateHealth.NewHealth = this.HitPoints;
+      this.Space.DispatchEvent(Events.UpdateHealthbar, updateHealth);
+    }
+    
+    if (event.OtherObject.Archetype == Archetype.EnemyBullet){
+      this.HitPoints -= 0.5;
+      this.DamageFeedback();
+      this.Owner.ChildrenArray.Get(1).PlayerTurret.Feedback();
+      this.Space.DispatchEvent(Events.Shake, ZilchEvent());
+      event.OtherObject.Destroy();
+      var updateHealth = DamageEvent();
+      updateHealth.NewHealth = this.HitPoints;
+      this.Space.DispatchEvent(Events.UpdateHealthbar, updateHealth);
+    }
+    
+    if (event.OtherObject.Archetype == Archetype.SpikeHitbox && this.PlayerDimension == 1){
+      this.HitPoints -= 0.5;
+      Math.Clamp(this.HitPoints, 0, 50);
+      this.DamageFeedback();
+      this.Space.DispatchEvent(Events.Shake, ZilchEvent());
+      var updateHealth = DamageEvent();
+      updateHealth.NewHealth = this.HitPoints;
+      this.Space.DispatchEvent(Events.UpdateHealthbar, updateHealth);
+    }
+    if (event.OtherObject.Archetype == Archetype.SpikeHitbox)
+        event.OtherObject.Parent.ForceEffect.Direction = Real3(0,-1,0);
+  }
+  
+  
+  
+  function ChangeDimension(event : DimensionEvent){
+    this.PlayerDimension = event.Dimension;
+  }
+  
+  
+  function LockCamera()
+  {
+    var lockCam = CameraEvent();
+    if (this.Owner.Transform.WorldTranslation.Y < 8.25 && this.Owner.Transform.WorldTranslation.Y > -8.25){
+      lockCam.LockLocation.Y = this.Owner.Transform.WorldTranslation.Y;
+    } 
+    else
+      if(this.Transform.WorldTranslation.Y < 0){
+        lockCam.LockLocation.Y = -8.25;
+        
+      } else {
+        lockCam.LockLocation.Y = 8.25;
+      }
+    if (this.Owner.Transform.WorldTranslation.X < 11.65 && this.Transform.WorldTranslation.X > -11.65){
+      lockCam.LockLocation.X = this.Transform.WorldTranslation.X;
+    } else
+      if(this.Transform.WorldTranslation.X < 0){
+        lockCam.LockLocation.X = -11.65;
+      } else {
+        lockCam.LockLocation.X = 11.65;
+      }
+    this.Space.DispatchEvent(Events.LockCamera, lockCam);
+  }
+  
+  
+  
+  function Rotate(rot : Real)
+  {
+    if (this.RotateAction != null){
+      this.RotateAction.Cancel();
+    }
+    
+    var rotDif = 0.0;
+    var targetRot = rot;
+    var turnDuration = 0.5;
+    var originalRot = this.Rotation;
+    
+    
+    if (Math.Abs(originalRot-targetRot) >= 180){
+      rotDif = 360 - Math.Abs(originalRot-targetRot);
+    } else {
+      rotDif = Math.Abs(originalRot-targetRot);
+    }
+    
+    turnDuration = rotDif / 190;
+    this.RotateAction = Action.Property(this.Owner.Actions, @this.Owner.Transform.Rotation, Math.ToQuaternion(Math.ToRadians(Real3(0,0,targetRot))), turnDuration, Ease.QuadInOut);
+  }
+  
+  function DamageFeedback(){
+      var seq = Actions.Sequence(this.Owner.Actions);
+      Actions.Property(seq, @this.Owner.Sprite.VertexColor, Real4(255,255,255,1), 0.05, Ease.Linear);
+      Actions.Property(seq, @this.Owner.Sprite.VertexColor, this.OgColor, 0.05, Ease.Linear);
+  }
+  
+  function Ability()
+  {
+      var dimensionShift = DimensionEvent();
+      this.Owner.Sprite.SpriteSource = this.DimensionalAnimation;
+      if (this.PlayerDimension == 1 && this.AbilityCooldown <= 0){
+        this.AbilityCooldown = this.DimensionalRiftCooldown;
+        dimensionShift.Dimension = 2;
+      } else {
+        dimensionShift.Dimension = 1;
+      }
+      this.Space.DispatchEvent(Events.ChangeDimension, dimensionShift);
+  }
+}
+
+
+
+
+
+//Camera event which handles locking the camera to the player
+class CameraEvent : ZilchEvent
+{
+  sends LockCamera : CameraEvent;
+  
+  var LockLocation : Real3;
+}
+
+class DimensionEvent : ZilchEvent
+{
+  sends ChangeDimension : DimensionEvent;
+  
+  var Dimension : Real;
+} 
+
+class DamageEvent : ZilchEvent
+{
+  sends UpdateHealthbar : DamageEvent;
+  sends PlayerDeath : DamageEvent;
+  
+  var NewHealth : Real;
+  var MaxHealth : Real;
+}
+

@@ -1,0 +1,9 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "MenuBackground"
+		var ResourceId = 0x5b8113a9ed5fad9d
+	}
+}

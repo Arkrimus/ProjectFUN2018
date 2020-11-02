@@ -1,0 +1,9 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "ReturnToMenu"
+		var ResourceId = 0x5b9c4717a7cc4e82
+	}
+}

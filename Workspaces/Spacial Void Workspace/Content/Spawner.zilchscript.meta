@@ -1,0 +1,17 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "Spawner"
+		var ResourceId = 0x5bf3c6ce2622c4aa
+	}
+	ContentTags 
+	{
+		var Tags = Array
+		{
+			"EnvironmentScript"
+			"ZilchScript"
+		}
+	}
+}

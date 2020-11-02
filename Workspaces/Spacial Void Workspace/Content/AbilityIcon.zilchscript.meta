@@ -1,0 +1,16 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "AbilityIcon"
+		var ResourceId = 0x5b8519d046b3c6f0
+	}
+	ContentTags 
+	{
+		var Tags = Array
+		{
+			"HUDScript"
+		}
+	}
+}

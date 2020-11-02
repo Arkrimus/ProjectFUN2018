@@ -1,0 +1,9 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "MenuMusic"
+		var ResourceId = 0x5b580ff87dc9abd8
+	}
+}

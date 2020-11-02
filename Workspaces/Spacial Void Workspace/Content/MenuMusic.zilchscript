@@ -1,0 +1,15 @@
+class MenuMusic : ZilchComponent
+{
+  function Initialize(init : CogInitializer)
+  {
+    this.Owner.SimpleSound.Play();
+    Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+  }
+
+  function OnLogicUpdate(event : UpdateEvent)
+  {
+    if (!this.Owner.SimpleSound.IsPlaying){
+      this.Owner.SimpleSound.Play();
+    }
+  }
+}

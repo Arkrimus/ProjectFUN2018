@@ -1,0 +1,20 @@
+[Version:1]
+ImageContent 
+{
+	SpriteSourceBuilder 
+	{
+		var Name = "Basher_0"
+		var ResourceId = 0x5b4f711e884c417a
+		var FrameSizeX = 75
+		var FrameSizeY = 75
+		var FrameCount = 14
+		var FrameDelay = 0.0833333358
+		var OriginX = 37.5
+		var OriginY = 37.5
+		var PixelsPerUnit = 64
+		var Sampling = SpriteSampling.Nearest
+		var Looping = true
+		var Slices = Real4{0, 0, 0, 0}
+		var Fill = SpriteFill.Stretch
+	}
+}

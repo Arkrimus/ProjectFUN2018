@@ -1,0 +1,20 @@
+[Version:1]
+ImageContent 
+{
+	SpriteSourceBuilder 
+	{
+		var Name = "Flash"
+		var ResourceId = 0x5b400dc2e9101a5c
+		var FrameSizeX = 150
+		var FrameSizeY = 150
+		var FrameCount = 4
+		var FrameDelay = 0.0833333358
+		var OriginX = 75
+		var OriginY = 75
+		var PixelsPerUnit = 150
+		var Sampling = SpriteSampling.Nearest
+		var Looping = true
+		var Slices = Real4{0, 0, 0, 0}
+		var Fill = SpriteFill.Stretch
+	}
+}

@@ -1,0 +1,16 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "ShadowTurret"
+		var ResourceId = 0x5b4ac3c0d10e9c23
+	}
+	ContentTags 
+	{
+		var Tags = Array
+		{
+			"EnemyScript"
+		}
+	}
+}

@@ -1,0 +1,149 @@
+[Version:1]
+Cog 
+{
+	var Name = "PlayerShip"
+	Transform 
+	{
+		var Translation = Real3{0, 0, 0.5}
+		var Scale = Real3{1.5, 1.5, 1}
+		var Rotation = Quaternion{0, 0, 0, 1}
+	}
+	Sprite 
+	{
+		var Visible = true
+		var ViewCulling = true
+		var VisibilityEvents = true
+		var OverrideBoundingBox = false
+		var LocalAabbCenter = Real3{0, 0, 0}
+		var LocalAabbHalfExtents = Real3{1, 1, 1}
+		var GroupSortValue = 0
+		var Material = "582c575af53d18c9:AlphaSprite"
+		var VertexColor = Real4{1, 1, 1, 1}
+		var GeometryMode = SpriteGeometryMode.ZPlane
+		var SpriteSource = "5bf2db50b6089fae:MovingShip"
+		var FlipX = false
+		var FlipY = false
+		var AnimationActive = true
+		var AnimationSpeed = 1
+		var StartFrame = 0
+	}
+	RigidBody 
+	{
+		var Velocity = Real3{0, 0, 0}
+		var AngularVelocity = Real3{0, 0, 0}
+		var DynamicState = RigidBodyDynamicState.Dynamic
+		var AllowSleep = true
+		var Asleep = false
+		var RotationLocked = true
+		var Mode2D = Mode2DStates.InheritFromSpace
+	}
+	ForceEffect 
+	{
+		var Active = false
+		var WakeUpOnChange = true
+		var DebugDrawEffect = true
+		var LocalSpaceDirection = true
+		var Strength = 400
+		var Direction = Real3{0, 1, 0}
+	}
+	DragEffect 
+	{
+		var Active = true
+		var WakeUpOnChange = true
+		var DebugDrawEffect = true
+		var LinearDamping = 2
+		var AngularDamping = 1
+		var LinearDrag = 0
+		var AngularDrag = 0
+	}
+	PlayerControls 
+	{
+		var Speed = 50
+		var TurnSpeed = 25
+		var DimensionalRiftCooldown = 2
+		var HitPoints = 25
+		var HealingFromPacks = 2
+	}
+	Area 
+	{
+		var Size = Real2{1.5, 1.5}
+		var Origin = Location.Center
+	}
+	MultiConvexMeshCollider 
+	{
+		var Ghost = false
+		var SendsEvents = true
+		var Material = "5b89cc2052d9fc4e:PlayerShip"
+		var CollisionGroup = "4e740859314e5515:DefaultGroup"
+		var Offset = Real3{0, 0, 0}
+		var Mesh = "5bf2a5d6c8dc0fac:PlayerShip"
+	}
+	TorqueEffect 
+	{
+		var Active = true
+		var WakeUpOnChange = true
+		var DebugDrawEffect = true
+		var LocalTorque = true
+		var TorqueStrength = 0
+		var TorqueAxis = Real3{0, 0, 1}
+	}
+	Hierarchy 
+	{
+		Cog [Id:0x5bf366061d2f6fa9][InheritId:"5bf366061d2fcc6e:EnemySlowZone"]
+		{
+			Transform 
+			{
+				var Translation = Real3{0, 0, -0.5}
+				var Rotation = Quaternion{0, 0, 0, 1}
+				var Scale = Real3{5, 5, 1}
+			}
+			Sprite 
+			{
+				var Visible = false
+			}
+			SphereCollider 
+			{
+				var Material = "5bf3653be28d9654:EnemySlowZone"
+				var CollisionGroup = "4e740859314e5515:DefaultGroup"
+				var SendsEvents = true
+			}
+			RigidBody [LocallyRemoved]
+			{
+			}
+		}
+		Cog [Id:0x5b4acaf78eca6376]
+		{
+			var Name = "Turret"
+			Transform 
+			{
+				var Translation = Real3{0, 0, 2}
+				var Scale = Real3{0.666660011, 0.666665971, 1}
+				var Rotation = Quaternion{0, 0, 0.707106829, 0.707106769}
+			}
+			Sprite 
+			{
+				var Visible = true
+				var ViewCulling = true
+				var VisibilityEvents = true
+				var OverrideBoundingBox = false
+				var LocalAabbCenter = Real3{0, 0, 0}
+				var LocalAabbHalfExtents = Real3{1, 1, 1}
+				var GroupSortValue = 0
+				var Material = "582c575af53d18c9:AlphaSprite"
+				var VertexColor = Real4{1, 1, 1, 1}
+				var GeometryMode = SpriteGeometryMode.ZPlane
+				var SpriteSource = "5b4acae28b25e481:Turret"
+				var FlipX = false
+				var FlipY = false
+				var AnimationActive = true
+				var AnimationSpeed = 1
+				var StartFrame = 0
+			}
+			TrackMouse 
+			{
+				var DelayBetweenShots = 0.125
+				var BulletSpeed = 50
+			}
+		}
+	}
+}

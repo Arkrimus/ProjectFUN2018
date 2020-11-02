@@ -1,0 +1,9 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "Options"
+		var ResourceId = 0x5b826c1f5d903bc5
+	}
+}

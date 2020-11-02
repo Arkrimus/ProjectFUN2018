@@ -1,0 +1,9 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "ButtonText"
+		var ResourceId = 0x5b4ee645a74e79fe
+	}
+}

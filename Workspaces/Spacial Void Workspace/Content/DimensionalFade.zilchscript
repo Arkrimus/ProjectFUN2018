@@ -1,0 +1,35 @@
+class DimensionalFade : ZilchComponent
+{
+  [Dependency] var Area : Area;
+  
+  sends ActivateTurrets : ZilchEvent;
+  sends DeactivateTurrets : ZilchEvent;
+  function Initialize(init : CogInitializer)
+  {
+    Zero.Connect(this.Space, Events.ChangeDimension, this.OnDimensionChange);
+  }
+
+  function OnDimensionChange(event : DimensionEvent)
+  {
+    var actionSequence = Actions.Sequence(this.Owner.Actions);
+    
+    if (event.Dimension == 1){Actions.Call(actionSequence, this.Broadcast, event.Dimension);}
+    
+    Actions.Property(actionSequence, @this.Owner.Sprite.VertexColor, Real4(0,0,0,1), 0.25, Ease.Linear);
+    Actions.Property(actionSequence, @this.Owner.Sprite.VertexColor, Real4(0,0,0,0), 1, Ease.Linear);
+    
+    if (event.Dimension == 2){Actions.Call(actionSequence, this.Broadcast, event.Dimension);}
+    
+  }
+
+  function Broadcast(dimension : Real){
+    if (dimension == 2){
+      this.Space.DispatchEvent(Events.ActivateTurrets, ZilchEvent());
+      Console.WriteLine("Activated");
+    }
+    if (dimension == 1){
+      this.Space.DispatchEvent(Events.DeactivateTurrets, ZilchEvent());
+      Console.WriteLine("Deactivated");
+    }
+  }
+}

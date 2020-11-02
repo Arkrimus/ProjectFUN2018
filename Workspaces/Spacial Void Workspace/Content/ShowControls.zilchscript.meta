@@ -1,0 +1,9 @@
+[Version:1]
+TextContent 
+{
+	ZilchScriptBuilder 
+	{
+		var Name = "ShowControls"
+		var ResourceId = 0x5b580f6a9158a842
+	}
+}
