@@ -1,6 +1,6 @@
-# ProjectFUN - 2018 Spacial Void
 ![Spacial Void](https://github.com/Gafarrell/ProjectFUN2018/blob/master/Art/Spacial%20Void.png)
 
+# ProjectFUN - 2018 Spacial Void
 A project in which 4 team members work together to create a game within a month time period.
 
 ## Project: Spacial Void
