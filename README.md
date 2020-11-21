@@ -1,6 +1,7 @@
 # ProjectFUN - 2018 Spacial Void
-A project in which 4 team members work together to create a game within a month time period.
+![Spacial Void](https://github.com/Gafarrell/ProjectFUN2018/blob/master/Art/Spacial%20Void.png)
 
+A project in which 4 team members work together to create a game within a month time period.
 
 ## Project: Spacial Void
 The game created is titled Spacial Void, a space-themed shooter with inspiration taken from Asteroids and Galaga, and implemented in a new style using [ZeroEngine](Zeroengine.io)
